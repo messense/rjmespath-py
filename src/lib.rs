@@ -3,7 +3,7 @@ use std::collections::BTreeMap;
 use pyo3::prelude::*;
 use pyo3::wrap_pyfunction;
 
-use jmespatch::{Rcvar, Variable};
+use jmespath::{Rcvar, Variable};
 use pyo3::exceptions::PyValueError;
 
 /// A compiled JMESPath expression
@@ -11,15 +11,14 @@ use pyo3::exceptions::PyValueError;
 /// Note that a compiled expression can't be accessed by another thread.
 #[pyclass(unsendable, module = "rjmespath")]
 struct Expression {
-    inner: jmespatch::Expression<'static>,
+    inner: jmespath::Expression<'static>,
 }
 
 #[pymethods]
 impl Expression {
     /// Search the JSON with a compiled JMESPath expression
     fn search(&self, py: Python, json: &str) -> PyResult<PyObject> {
-        let data =
-            jmespatch::Variable::from_json(json).map_err(|err| PyValueError::new_err(err))?;
+        let data = jmespath::Variable::from_json(json).map_err(|err| PyValueError::new_err(err))?;
         let result = self.inner.search(data).map_err(|err| {
             let msg = format!("JMESPath expression search failed: {}", err);
             PyValueError::new_err(msg)
@@ -33,17 +32,7 @@ fn rcvar_to_pyobject(py: Python, var: Rcvar) -> PyObject {
         Variable::Null => py.None(),
         Variable::String(v) => v.into_py(py),
         Variable::Bool(v) => v.into_py(py),
-        Variable::Number(v) => {
-            if let Some(v) = v.as_f64() {
-                return v.into_py(py);
-            } else if let Some(v) = v.as_u64() {
-                return v.into_py(py);
-            } else if let Some(v) = v.as_i64() {
-                return v.into_py(py);
-            } else {
-                unreachable!()
-            }
-        }
+        Variable::Number(v) => v.into_py(py),
         Variable::Array(v) => {
             let arr: Vec<_> = v.iter().map(|x| rcvar_to_pyobject(py, x.clone())).collect();
             arr.into_py(py)
@@ -62,11 +51,11 @@ fn rcvar_to_pyobject(py: Python, var: Rcvar) -> PyObject {
 /// Search the JSON with a JMESPath expression
 #[pyfunction]
 fn search(py: Python, expr: &str, json: &str) -> PyResult<PyObject> {
-    let expr = jmespatch::compile(expr).map_err(|err| {
+    let expr = jmespath::compile(expr).map_err(|err| {
         let msg = format!("Invalid JMESPath expression: {}", err);
         PyValueError::new_err(msg)
     })?;
-    let data = jmespatch::Variable::from_json(json).map_err(|err| PyValueError::new_err(err))?;
+    let data = jmespath::Variable::from_json(json).map_err(|err| PyValueError::new_err(err))?;
     let result = expr.search(data).map_err(|err| {
         let msg = format!("JMESPath expression search failed: {}", err);
         PyValueError::new_err(msg)
@@ -77,7 +66,7 @@ fn search(py: Python, expr: &str, json: &str) -> PyResult<PyObject> {
 /// Compiles a JMESPath expression
 #[pyfunction]
 fn compile(expr: &str) -> PyResult<Expression> {
-    let inner = jmespatch::compile(expr).map_err(|err| {
+    let inner = jmespath::compile(expr).map_err(|err| {
         let msg = format!("Invalid JMESPath expression: {}", err);
         PyValueError::new_err(msg)
     })?;
