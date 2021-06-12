@@ -28,7 +28,7 @@ jobs:
         run: |
           pip install rjmespath --no-index --find-links dist --force-reinstall
           pip install pytest
-          cd tests && pytest -v
+          cd tests && pytest
       - name: Build wheels - universal2
         uses: messense/maturin-action@v1
         with:
@@ -36,7 +36,7 @@ jobs:
       - name: Install built wheel - universal2
         run: |
           pip install rjmespath --no-index --find-links dist --force-reinstall
-          cd tests && pytest -v
+          cd tests && pytest
       - name: Upload wheels
         uses: actions/upload-artifact@v2
         with:
@@ -69,7 +69,7 @@ jobs:
         run: |
           pip install rjmespath --no-index --find-links dist --force-reinstall
           pip install pytest
-          cd tests && pytest -v
+          cd tests && pytest
       - name: Upload wheels
         uses: actions/upload-artifact@v2
         with:
@@ -98,7 +98,7 @@ jobs:
       run: |
         pip install rjmespath --no-index --find-links dist --force-reinstall
         pip install pytest
-        cd tests && pytest -v
+        cd tests && pytest
     - name: Upload wheels
       uses: actions/upload-artifact@v2
       with:
@@ -139,7 +139,7 @@ jobs:
           ls -lrth /artifacts
           pip3 install rjmespath --no-index --find-links /artifacts --force-reinstall
           pip3 install pytest
-          cd tests && pytest -v
+          cd tests && pytest
     - name: Upload wheels
       uses: actions/upload-artifact@v2
       with:
