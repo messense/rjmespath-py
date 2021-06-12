@@ -21,7 +21,7 @@ def _walk_files():
 
 
 def load_cases(full_path):
-    all_test_data = json.load(open(full_path))
+    all_test_data = json.load(open(full_path, encoding="utf-8"))
     for test_data in all_test_data:
         given = json.dumps(test_data["given"])
         for case in test_data["cases"]:
