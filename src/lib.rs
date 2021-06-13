@@ -9,7 +9,7 @@ use pyo3::exceptions::PyValueError;
 /// A compiled JMESPath expression
 ///
 /// Note that a compiled expression can't be accessed by another thread.
-#[pyclass(unsendable, module = "rjmespath")]
+#[pyclass(module = "rjmespath")]
 struct Expression {
     inner: jmespath::Expression<'static>,
 }
