@@ -136,11 +136,10 @@ jobs:
         install: |
           apt-get update
           apt-get install -y --no-install-recommends python3 python3-pip
-          pip3 install -U pip
+          pip3 install -U pip pytest
         run: |
           ls -lrth /artifacts
           pip3 install rjmespath --no-index --find-links /artifacts --force-reinstall
-          pip3 install pytest
           cd tests && pytest
     - name: Upload wheels
       uses: actions/upload-artifact@v2
