@@ -1,7 +1,7 @@
 # rjmespath-py
 
 ![CI](https://github.com/messense/rjmespath-py/workflows/CI/badge.svg)
-[![PyPI](https://img.shields.io/pypi/v/rjmespath.svg)](https://pypi.org/project/rjieba)
+[![PyPI](https://img.shields.io/pypi/v/rjmespath.svg)](https://pypi.org/project/rjmespath)
 
 [jmespath.rs](https://github.com/jmespath/jmespath.rs) Python binding.
 
