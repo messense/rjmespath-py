@@ -99,6 +99,7 @@ fn compile(expr: &str) -> PyResult<Expression> {
 #[pymodule]
 fn rjmespath(_py: Python, m: &PyModule) -> PyResult<()> {
     m.add("__version__", env!("CARGO_PKG_VERSION"))?;
+    m.add_class::<Expression>()?;
     m.add_function(wrap_pyfunction!(search, m)?)?;
     m.add_function(wrap_pyfunction!(compile, m)?)?;
     Ok(())
