@@ -1,10 +1,9 @@
-use std::collections::BTreeMap;
-
 use pyo3::prelude::*;
 use pyo3::wrap_pyfunction;
 
 use jmespath::{Rcvar, Variable};
 use pyo3::exceptions::PyValueError;
+use pyo3::types::{PyDict, PyList};
 
 /// A compiled JMESPath expression
 ///
@@ -42,15 +41,16 @@ fn rcvar_to_pyobject(py: Python, var: Rcvar) -> PyObject {
         Variable::Bool(v) => v.into_py(py),
         Variable::Number(v) => v.into_py(py),
         Variable::Array(v) => {
-            let arr: Vec<_> = v.iter().map(|x| rcvar_to_pyobject(py, x.clone())).collect();
+            let arr = PyList::new(py, v.iter().map(|x| rcvar_to_pyobject(py, x.clone())));
             arr.into_py(py)
         }
         Variable::Object(v) => {
-            let map: BTreeMap<_, _> = v
-                .iter()
-                .map(|(k, v)| (k.clone(), rcvar_to_pyobject(py, v.clone())))
-                .collect();
-            map.into_py(py)
+            let dict = PyDict::new(py);
+            for (k, v) in v {
+                dict.set_item(k, rcvar_to_pyobject(py, v.clone()))
+                    .expect("failed to set_item on PyDict");
+            }
+            dict.into_py(py)
         }
         Variable::Expref(_) => unimplemented!(),
     }
