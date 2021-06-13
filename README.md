@@ -32,13 +32,13 @@ In [3]: %timeit jmespath.compile('foo')
 436 ns ± 0.478 ns per loop (mean ± std. dev. of 7 runs, 1000000 loops each)
 
 In [4]: %timeit rjmespath.compile('foo')
-355 ns ± 3.65 ns per loop (mean ± std. dev. of 7 runs, 1000000 loops each)
+354 ns ± 0.583 ns per loop (mean ± std. dev. of 7 runs, 1000000 loops each)
 
 In [5]: %timeit jmespath.search('foo.bar', {"foo": {"bar": "baz"}})
 2.74 µs ± 10.1 ns per loop (mean ± std. dev. of 7 runs, 100000 loops each)
 
 In [6]: %timeit rjmespath.search('foo.bar', '{"foo": {"bar": "baz"}}')
-1.64 µs ± 67 ns per loop (mean ± std. dev. of 7 runs, 1000000 loops each)
+1.67 µs ± 3.26 ns per loop (mean ± std. dev. of 7 runs, 1000000 loops each)
 ```
 
 ## License

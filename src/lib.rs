@@ -14,15 +14,23 @@ struct Expression {
     inner: jmespath::Expression<'static>,
 }
 
+impl Expression {
+    #[inline]
+    fn search_impl(&self, json: &str) -> Result<Rcvar, String> {
+        let data = jmespath::Variable::from_json(json)?;
+        self.inner
+            .search(data)
+            .map_err(|err| format!("JMESPath expression search failed: {}", err))
+    }
+}
+
 #[pymethods]
 impl Expression {
     /// Search the JSON with a compiled JMESPath expression
     fn search(&self, py: Python, json: &str) -> PyResult<PyObject> {
-        let data = jmespath::Variable::from_json(json).map_err(|err| PyValueError::new_err(err))?;
-        let result = self.inner.search(data).map_err(|err| {
-            let msg = format!("JMESPath expression search failed: {}", err);
-            PyValueError::new_err(msg)
-        })?;
+        let result = py
+            .allow_threads(|| self.search_impl(json))
+            .map_err(|err| PyValueError::new_err(err))?;
         Ok(rcvar_to_pyobject(py, result))
     }
 }
@@ -48,18 +56,21 @@ fn rcvar_to_pyobject(py: Python, var: Rcvar) -> PyObject {
     }
 }
 
+#[inline]
+fn search_impl(expr: &str, json: &str) -> Result<Rcvar, String> {
+    let expr =
+        jmespath::compile(expr).map_err(|err| format!("Invalid JMESPath expression: {}", err))?;
+    let data = jmespath::Variable::from_json(json)?;
+    expr.search(data)
+        .map_err(|err| format!("JMESPath expression search failed: {}", err))
+}
+
 /// Search the JSON with a JMESPath expression
 #[pyfunction]
 fn search(py: Python, expr: &str, json: &str) -> PyResult<PyObject> {
-    let expr = jmespath::compile(expr).map_err(|err| {
-        let msg = format!("Invalid JMESPath expression: {}", err);
-        PyValueError::new_err(msg)
-    })?;
-    let data = jmespath::Variable::from_json(json).map_err(|err| PyValueError::new_err(err))?;
-    let result = expr.search(data).map_err(|err| {
-        let msg = format!("JMESPath expression search failed: {}", err);
-        PyValueError::new_err(msg)
-    })?;
+    let result = py
+        .allow_threads(|| search_impl(expr, json))
+        .map_err(|err| PyValueError::new_err(err))?;
     Ok(rcvar_to_pyobject(py, result))
 }
 
