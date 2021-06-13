@@ -1,5 +1,5 @@
 use pyo3::prelude::*;
-use pyo3::wrap_pyfunction;
+use pyo3::{wrap_pyfunction, PyObjectProtocol};
 
 use jmespath::{Rcvar, Variable};
 use pyo3::exceptions::PyValueError;
@@ -31,6 +31,17 @@ impl Expression {
             .allow_threads(|| self.search_impl(json))
             .map_err(|err| PyValueError::new_err(err))?;
         Ok(rcvar_to_pyobject(py, result))
+    }
+}
+
+#[pyproto]
+impl PyObjectProtocol for Expression {
+    fn __str__(&self) -> &str {
+        self.inner.as_str()
+    }
+
+    fn __repr__(&self) -> String {
+        self.inner.as_ast().to_string()
     }
 }
 
