@@ -1,0 +1,9 @@
+from typing import Any
+
+
+class Expression:
+    def search(self, json: str) -> Any: ...
+
+
+def compile(expr: str) -> Expression: ...
+def search(expr: str, json: str) -> Any: ...
