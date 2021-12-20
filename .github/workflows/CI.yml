@@ -156,13 +156,10 @@ jobs:
       - uses: actions/download-artifact@v2
         with:
           name: wheels
-      - uses: actions/setup-python@v2
-        with:
-          python-version: 3.9
       - name: Publish to PyPi
         env:
           MATURIN_PYPI_TOKEN: ${{ secrets.PYPI_PASSWORD }}
-        uses: messense/maturin-action@v1
+        uses: messense/maturin-action@upload
         with:
           command: upload
           args: --skip-existing *
