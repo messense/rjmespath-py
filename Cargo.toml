@@ -16,4 +16,4 @@ crate-type = ["cdylib"]
 
 [dependencies]
 jmespath = { git = "https://github.com/messense/jmespath.rs.git", branch = "clippy", features = ["sync", "specialized"] }
-pyo3 = { version = "0.15.0", features = ["abi3-py36", "extension-module"] }
+pyo3 = { version = "0.16.0", features = ["abi3-py36", "extension-module"] }
