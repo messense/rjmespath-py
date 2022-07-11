@@ -2,7 +2,6 @@ use jmespath::{Rcvar, Variable};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
 use pyo3::types::{PyDict, PyList};
-use pyo3::PyObjectProtocol;
 
 /// A compiled JMESPath expression
 ///
@@ -31,10 +30,7 @@ impl Expression {
             .map_err(|err| PyValueError::new_err(err))?;
         Ok(rcvar_to_pyobject(py, result))
     }
-}
 
-#[pyproto]
-impl PyObjectProtocol for Expression {
     fn __str__(&self) -> &str {
         self.inner.as_str()
     }
@@ -49,7 +45,15 @@ fn rcvar_to_pyobject(py: Python, var: Rcvar) -> PyObject {
         Variable::Null => py.None(),
         Variable::String(v) => v.into_py(py),
         Variable::Bool(v) => v.into_py(py),
-        Variable::Number(v) => v.into_py(py),
+        Variable::Number(v) => {
+            if v.is_i64() {
+                v.as_i64().unwrap().into_py(py)
+            } else if v.is_u64() {
+                v.as_u64().unwrap().into_py(py)
+            } else {
+                v.as_f64().unwrap().into_py(py)
+            }
+        }
         Variable::Array(v) => {
             let arr = PyList::new(py, v.iter().map(|x| rcvar_to_pyobject(py, x.clone())));
             arr.into_py(py)
