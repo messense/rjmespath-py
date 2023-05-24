@@ -16,4 +16,4 @@ crate-type = ["cdylib"]
 
 [dependencies]
 jmespath = { version = "0.3.0", features = ["sync", "specialized"] }
-pyo3 = { version = "0.17.3", features = ["abi3-py37", "extension-module"] }
+pyo3 = { version = "0.18.3", features = ["abi3-py37", "extension-module"] }
